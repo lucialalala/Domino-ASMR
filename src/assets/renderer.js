@@ -182,7 +182,7 @@
     var ctx = this.overlayContext; ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); ctx.clearRect(0, 0, this.width, this.height);
     if (ghost && !path.active) {
       var start = camera.project(this.ghost[0].x, 0, this.ghost[0].z);
-      ctx.fillStyle = '#a6ac9c'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('在空白处，画出你的路线', this.width / 2, Math.min(this.height - 230, this.height * .70));
+      ctx.fillStyle = '#a6ac9c'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('在空白处，画出你的路线', this.width / 2, Math.min(this.height - 230, this.height * .70) + 12);
       ctx.strokeStyle = '#bdc9b5'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(start.x, start.y + 10, 5, 0, Math.PI * 2); ctx.stroke();
       return;
     }

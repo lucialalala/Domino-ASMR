@@ -96,9 +96,15 @@ try {
   assert(await evaluate('document.getElementById("sound").getBoundingClientRect().top') >= 57);
   assert.equal(await evaluate('Domino.app.renderer.mode'), 'webgl');
   await snapshot('mobile-empty'); passed('mobile startup under restrictive CSP', await evaluate('Domino.app.diagnostics()'));
+  assert.equal(await evaluate('document.getElementById("hint").textContent'), '滑动摆放，点击推倒');
+  await evaluate('(function(){var hint=document.getElementById("hint");window.dragHintFlashes=0;window.dragHintUpdates=[];window.dragHintObserver=new MutationObserver(function(){if(Domino.app.path.active){window.dragHintUpdates.push(hint.textContent);if(hint.textContent==="滑动摆放 · 松手后可从尾点续画")window.dragHintFlashes++;}});window.dragHintObserver.observe(hint,{childList:true,characterData:true,subtree:true});}())');
   const points = Array.from({ length: 42 }, (_, i) => ({ x: 85 + i * 4.8, y: 365 + i * 3.5 }));
   await stroke(points, true);
   const builtCount = await evaluate('Domino.app.path.bones.length'); assert(builtCount >= 12);
+  assert.equal(await evaluate('window.dragHintFlashes'), 0);
+  assert.deepEqual(await evaluate('window.dragHintUpdates'), ['沿着彩虹继续画']);
+  assert.equal(await evaluate('document.getElementById("hint").textContent'), '滑动摆放 · 松手后可从尾点续画');
+  await evaluate('window.dragHintObserver.disconnect()'); passed('drag hint remains stable until the whole stroke completes');
   await snapshot('mobile-built'); passed('touch construction, follow camera, stationary finger', { count: builtCount });
   await click('sound'); assert.equal(await evaluate('Domino.app.audio.muted'), true);
   await click('sound'); assert.equal(await evaluate('Domino.app.audio.muted'), false); passed('sound toggle');

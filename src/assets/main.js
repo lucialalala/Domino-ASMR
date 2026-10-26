@@ -30,19 +30,27 @@
     element('sound-label').textContent = audio.status === 'unavailable' ? '声音暂不可用' : audio.muted ? '声音已关' : '声音已开';
   }
   function syncUI(force) {
-    if (!force && lastCount === path.bones.length && lastUIState === app.state + path.active) return;
-    lastCount = path.bones.length; lastUIState = app.state + path.active;
+    var blocked = Boolean(path.preview && !path.preview.valid);
+    var uiState = app.state + ':' + path.active + ':' + blocked;
+    if (!force && lastCount === path.bones.length && lastUIState === uiState) return;
+    lastCount = path.bones.length; lastUIState = uiState;
     count.textContent = String(lastCount);
     intro.classList.toggle('is-hidden', lastCount > 0 || path.active);
     play.disabled = lastCount < 2 || path.active || app.state === 'PREPARING' || app.state === 'TOPPLING' || app.state === 'PAUSED';
     undo.disabled = !path.strokes.length || path.active || !(editable() || app.state === 'FINISHED');
     clear.disabled = !lastCount;
-    var label = element('play-label');
-    if (app.state === 'PREPARING') { phase.textContent = '回到起点'; hint.textContent = '把下一刻交给重力'; label.textContent = '准备中'; }
-    else if (app.state === 'TOPPLING') { phase.textContent = '正在落下'; hint.textContent = '听，彩虹有了声音'; label.textContent = '轻轻落下中'; }
-    else if (app.state === 'FINISHED') { phase.textContent = '这一刻，很好'; hint.textContent = '可以重听，也可以重新画'; label.textContent = '再听一次'; }
-    else if (app.state === 'PAUSED') { phase.textContent = '稍作停留'; hint.textContent = '你的彩虹已暂停'; label.textContent = '已暂停'; }
-    else { phase.textContent = '自由建造'; hint.textContent = lastCount >= C.maxCount ? '已放满 400 张，推倒听听吧' : '滑动摆放 · 松手后可从尾点续画'; label.textContent = '推倒彩虹'; }
+    var label = element('play-label'), hintText;
+    if (app.state === 'PREPARING') { phase.textContent = '回到起点'; hintText = '把下一刻交给重力'; label.textContent = '准备中'; }
+    else if (app.state === 'TOPPLING') { phase.textContent = '正在落下'; hintText = '听，彩虹有了声音'; label.textContent = '轻轻落下中'; }
+    else if (app.state === 'FINISHED') { phase.textContent = '这一刻，很好'; hintText = '可以重听，也可以重新画'; label.textContent = '再听一次'; }
+    else if (app.state === 'PAUSED') { phase.textContent = '稍作停留'; hintText = '你的彩虹已暂停'; label.textContent = '已暂停'; }
+    else {
+      phase.textContent = '自由建造'; label.textContent = '推倒彩虹';
+      if (path.active) hintText = blocked ? '转弯放缓一点，给骨牌留些空间' : '沿着彩虹继续画';
+      else if (lastCount >= C.maxCount) hintText = '已放满 400 张，推倒听听吧';
+      else hintText = lastCount ? '滑动摆放 · 松手后可从尾点续画' : '滑动摆放，点击推倒';
+    }
+    if (hint.textContent !== hintText) hint.textContent = hintText;
     stage.style.cursor = editable() ? 'crosshair' : 'default';
   }
   function requestDraw() {
@@ -58,8 +66,6 @@
     if (path.active) {
       if (path.process(C.maxPlacements)) dirty = true;
       if (!path.active) app.state = path.bones.length ? 'EDITING' : 'EMPTY';
-      if (path.preview && !path.preview.valid) { hint.textContent = '转弯放缓一点，给骨牌留些空间'; dirty = true; }
-      else if (path.preview) hint.textContent = '沿着彩虹继续画';
     }
     if (app.state === 'PREPARING') {
       prepTime += dt;
