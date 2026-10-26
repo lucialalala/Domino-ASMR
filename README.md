@@ -43,7 +43,7 @@ npm run test:browser # 本地浏览器交互检查及截图
 
 `src/assets/` 按路径、模拟、渲染、镜头、音效和容器适配拆分；参数集中在 `config.js`。实现依据见 [DEVELOPMENT.md](./DEVELOPMENT.md)，检查范围见 [VALIDATION.md](./VALIDATION.md)。
 
-顶部区域在平台安全区之外额外下移 32px；需要微调时修改 `style.css` 的 `--header-offset`。
+顶部区域在平台安全区之外额外下移 22px；需要微调时修改 `style.css` 的 `--header-offset`。
 
 ## minitool 打包
 
