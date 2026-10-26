@@ -92,6 +92,8 @@ try {
   await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   await navigate();
   assert.equal(await evaluate('Domino.app.state'), 'EMPTY');
+  assert.equal(await evaluate('document.querySelector("h1").textContent'), '多米诺ASMR');
+  assert(await evaluate('document.getElementById("sound").getBoundingClientRect().top') >= 57);
   assert.equal(await evaluate('Domino.app.renderer.mode'), 'webgl');
   await snapshot('mobile-empty'); passed('mobile startup under restrictive CSP', await evaluate('Domino.app.diagnostics()'));
   const points = Array.from({ length: 42 }, (_, i) => ({ x: 85 + i * 4.8, y: 365 + i * 3.5 }));

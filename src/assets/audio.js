@@ -40,7 +40,8 @@
     var intended = this.frameTime + event.time - this.frameSim;
     if (intended < context.currentTime - .075) return;
     var when = Math.max(context.currentTime, Math.min(context.currentTime + .07, intended));
-    var frequency = D.config.notes[event.note % D.config.notes.length];
+    var cycle = D.config.noteCycle;
+    var frequency = D.config.notes[cycle[event.note % cycle.length]];
     var soft = event.type === 'groundContact' ? .42 : 1;
     var voice = { nodes: [], sources: [], disposed: false }, self = this;
     voice.dispose = function () {

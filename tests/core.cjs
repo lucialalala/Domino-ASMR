@@ -126,18 +126,20 @@ check('rainbow is deterministic, low-saturation and cyclic', () => {
 });
 async function checkAudio() {
   let constructed = 0;
+  const oscillatorFrequencies = [];
   const parameter = () => ({ value: 0, setValueAtTime() {}, exponentialRampToValueAtTime() {} });
   function node() { return { connect() {}, disconnect() {}, start() {}, stop() {}, gain: parameter(), frequency: parameter(), Q: parameter(), threshold: parameter(), knee: parameter(), ratio: parameter() }; }
   class AudioContext {
     constructor() { constructed++; this.state = 'running'; this.sampleRate = 8000; this.currentTime = 0; this.destination = {}; }
     createGain() { return node(); } createDynamicsCompressor() { return node(); }
     createBuffer(c, length) { return { getChannelData() { return new Float32Array(length); } }; }
-    createOscillator() { return node(); } createBufferSource() { return node(); } createBiquadFilter() { return node(); }
+    createOscillator() { const oscillator = node(); oscillator.frequency.setValueAtTime = value => oscillatorFrequencies.push(value); return oscillator; } createBufferSource() { return node(); } createBiquadFilter() { return node(); }
     resume() { this.state = 'running'; return Promise.resolve(); } suspend() { this.state = 'suspended'; return Promise.resolve(); }
   }
   sandbox.window.AudioContext = AudioContext;
   const audio = new D.Audio(); assert(await audio.unlock()); audio.beginFrame(0, .016);
   for (let i = 0; i < 20; i++) audio.play({ type: 'dominoContact', note: i, time: .01 }, 0);
+  assert.deepEqual(oscillatorFrequencies.filter((value, index) => index % 2 === 0), [261.63, 293.66, 329.63, 349.23, 392, 440, 493.88, 523.25, 493.88, 440, 392, 349.23, 329.63, 293.66, 261.63, 293.66, 329.63, 349.23, 392, 440]);
   assert.equal(audio.voices.length, 8);
   audio.setMuted(true); assert.equal(audio.voices.length, 0); assert.equal(audio.master.gain.value, 0);
   audio.play({ note: 0, time: 0 }, 0); assert.equal(audio.voices.length, 0);
@@ -146,7 +148,7 @@ async function checkAudio() {
   audio.suspend(); assert.equal(audio.voices.length, 0); assert(await audio.unlock()); assert.equal(constructed, 1);
   sandbox.window.AudioContext = undefined;
   const absent = new D.Audio(); assert.equal(await absent.unlock(), false); assert.equal(absent.status, 'unavailable');
-  checks++; console.log('PASS audio voice cap, mute, stale-frame suppression, cleanup and capability failure');
+  checks++; console.log('PASS ascending/descending audio cycle, voice cap, mute, stale-frame suppression, cleanup and capability failure');
   console.log('\n' + checks + ' checks passed. Container/audio/device verification is separate.');
 }
 checkAudio().catch(error => { console.error(error); process.exitCode = 1; });
