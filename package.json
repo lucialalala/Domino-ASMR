@@ -1,0 +1,12 @@
+{
+  "name": "rainbow-domino",
+  "version": "1.0.0",
+  "private": true,
+  "description": "离线三维彩虹多米诺小游戏",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node tests/core.cjs",
+    "test:browser": "node tests/browser.mjs",
+    "audit": "node .codex/skills/minitool-zip-builder/scripts/audit_artifact.mjs ./src"
+  }
+}

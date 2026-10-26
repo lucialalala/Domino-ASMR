@@ -1,0 +1,4 @@
+.preview/
+dist/
+*.zip
+node_modules/
