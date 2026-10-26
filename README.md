@@ -45,4 +45,12 @@ npm run test:browser # 本地浏览器交互检查及截图
 
 顶部区域在平台安全区之外额外下移 32px；需要微调时修改 `style.css` 的 `--header-offset`。
 
-当前未生成 minitool ZIP；GitHub Pages 直接托管 `src/`。后续打包应仅包含 `src/` 内文件，入口直接放 ZIP 根目录。普通浏览器通过不代表 minitool 验收；创服平台模拟器、Android/iOS 真机以及实际音质、音画同步仍待验证。
+## minitool 打包
+
+```sh
+python tools/package-minitool.py
+```
+
+生成项目根目录的 `Domino-ASMR-minitool.zip`，仅包含 `src/` 内文件，`index.html` 直接位于 ZIP 根目录；脚本会审计目录与最终 ZIP，并校验包内文件和源码一致。GitHub Pages 仍直接托管 `src/`。
+
+上传 ZIP 后，请先在创服平台模拟器验证，再用 Android 和 iOS 真机扫码验证同一个包。普通浏览器通过不代表 minitool 验收；实际音质、音画同步和真机性能仍待验证。
